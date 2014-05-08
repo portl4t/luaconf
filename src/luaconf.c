@@ -61,8 +61,17 @@ luaconf_destroy(luaconf_inst *inst)
     free(inst);
 }
 
-luaconf_Number
-luaconf_getNumber(luaconf_inst *inst, const char *path)
+
+luaconf_elt *
+luaconf_getElts(luaconf_inst *inst, luaconf_elt *elt, const char *path, size_t *n)
 {
+    *n = 0;
+
+    if (elt) {
+        if (elt->type != LUACONF_TYPE_TABLE)
+            return NULL;
+
+    } else {
+    }
 }
 
