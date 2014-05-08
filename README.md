@@ -58,3 +58,9 @@ int main(int argc, char *argv[])
     make
     make install
 
+## C API
+
+### luaconf_init
+**syntax:** *luaconf_inst *luaconf_init(const char *conf);*
+
+*description:* *This function opens the `conf` file*
