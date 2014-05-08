@@ -79,12 +79,8 @@ luaconf_freeElt(luaconf_elt *elt)
     if (top == elt->pos) {          // at top
         lua_pop(L, 1);
 
-        top  = lua_gettop(L);
-
-        while (top > 0 && lua_isnil(L, -1)) {
+        while (lua_gettop(L) > 0 && lua_isnil(L, -1))
             lua_pop(L, 1);
-            top = lua_gettop(L);
-        }
 
     } else {
         lua_pushnil(L);
@@ -131,19 +127,18 @@ char *
 luaconf_getStr(luaconf_elt *elt, char *buf, size_t size, size_t *len)
 {
     const char  *var;
-    size_t      var_len;
+    size_t      var_len, need;
 
     LUACONF_ASSERT(elt && elt->type == LUACONF_TYPE_STRING);
 
     var = lua_tolstring(elt->L, elt->pos, &var_len);
 
-    if (size >= var_len) {
-        *len = var_len;
-        memcpy(buf, var, var_len);
-        return buf;
-    }
+    need = var_len > size ? size : var_len;
 
-    return NULL;
+    memcpy(buf, var, need);
+    *len = need;
+
+    return buf;
 }
 
 luaconf_elt *
@@ -284,7 +279,7 @@ luaconf_get(lua_State *L, const char *begin, const char *end)
         new_elt->pos = lua_gettop(L);
         new_elt->L = L;
 
-        snprintf(new_elt->vname, sizeof(new_elt->vname), "%.*s", ptr-start, start);
+        snprintf(new_elt->vname, sizeof(new_elt->vname), "%.*s", (int)(ptr-start), start);
 
         return new_elt;
     }
@@ -346,7 +341,7 @@ luaconf_getSubElts(luaconf_elt *elt, luaconf_elt **vec, size_t size, size_t *n)
         new_elt->pos = lua_gettop(L) - 1;
         new_elt->type = lua_type(L, new_elt->pos);
 
-        snprintf(new_elt->vname, LUACONF_MAX_NAME_LEN, "%.*s", key_len, key);
+        snprintf(new_elt->vname, LUACONF_MAX_NAME_LEN, "%.*s", (int)key_len, key);
         vec[i++] = new_elt;
     }
 

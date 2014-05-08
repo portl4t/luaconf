@@ -5,6 +5,7 @@
 #include <stdlib.h>
 #include <string.h>
 #include <assert.h>
+#include <ctype.h>
 #include <lua.h>
 #include <lualib.h>
 #include <lauxlib.h>
