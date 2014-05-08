@@ -61,6 +61,7 @@ int main(int argc, char *argv[])
 ## C API
 
 ### luaconf_init
-**syntax:** luaconf_inst *luaconf_init(const char *conf);
+**syntax:** **luaconf_inst *luaconf_init(const char *conf);**
 
-**description:** This function opens the `conf` file
+This function opens the `conf` file which is written in Lua and parse it. Upon successful luaconf_init() returns a `luaconf_inst` pointer, Otherwise, NULL is returned.
+
