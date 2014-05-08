@@ -18,7 +18,7 @@ luaconf_init(const char *conf)
         return NULL;
     }
 
-    if (luaL_loadfile(L, conf->script)) {
+    if (luaL_loadfile(L, conf)) {
         fprintf(stderr, "luaL_loadfile %s failed: %s\n",
                             conf, lua_tostring(L, -1));
         lua_pop(L, 1);
@@ -27,12 +27,15 @@ luaconf_init(const char *conf)
 
     if (lua_pcall(L, 0, 0, 0)) {
         fprintf(stderr, "lua_pcall %s failed: %s\n",
-                            conf->script, lua_tostring(L, -1));
+                            conf, lua_tostring(L, -1));
         lua_pop(L, 1);
         goto failed;
     }
 
     inst = (luaconf_inst*)malloc(sizeof(luaconf_inst));
+    if (inst == NULL)
+        goto failed;
+
     inst->L = L;
     inst->conf = conf;
 
@@ -73,12 +76,14 @@ luaconf_freeElt(luaconf_elt *elt)
     L = elt->L;
     top = lua_gettop(L);
 
-    if (top == elt->pos) {
-        lua_pop(L, -1);
+    if (top == elt->pos) {          // at top
+        lua_pop(L, 1);
 
         top  = lua_gettop(L);
+
         while (top > 0 && lua_isnil(L, -1)) {
-            lua_pop(L, -1);
+            lua_pop(L, 1);
+            top = lua_gettop(L);
         }
 
     } else {
@@ -100,6 +105,19 @@ luaconf_getNumber(luaconf_elt *elt)
 
     return num;
 }
+
+int
+luaconf_getBool(luaconf_elt *elt)
+{
+    int     res;
+
+    LUACONF_ASSERT(elt && elt->type == LUACONF_TYPE_BOOL);
+
+    res = lua_toboolean(elt->L, elt->pos);
+
+    return res;
+}
+
 
 size_t
 luaconf_getStrLen(luaconf_elt *elt)
@@ -131,13 +149,11 @@ luaconf_getStr(luaconf_elt *elt, char *buf, size_t size, size_t *len)
 luaconf_elt *
 luaconf_getElt(luaconf_inst *inst, const char *path, size_t path_len)
 {
-    int             n;
     lua_State       *L;
     luaconf_elt     *new_elt;
     const char      *begin, *end, *ptr;
 
     L = inst->L;
-    n = lua_gettop(L);
     new_elt = NULL;
 
     lua_pushvalue(L, LUA_GLOBALSINDEX);     // push global table
@@ -147,16 +163,16 @@ luaconf_getElt(luaconf_inst *inst, const char *path, size_t path_len)
         ptr = path;
         end = ptr + path_len;
 
-        while (begin < end && !isalpha(*begin))
+        while (begin < end && !(isalnum(*begin) || *begin == '_'))
             begin++;
 
-        while (begin < end && !isalpha(*(end-1)))
+        while (begin < end && !(isalnum(*(end-1)) || *(end-1) == '_'))
             end--;
 
         if (begin >= end)
             goto nbrch;
 
-        return luaconf_get(L, start, end);
+        return luaconf_get(L, begin, end);
     }
 
 nbrch:
@@ -167,9 +183,10 @@ nbrch:
         return NULL;
     }
 
-    new_elt->pos = n - 1;
+    new_elt->pos = lua_gettop(L);
     new_elt->type = LUACONF_TYPE_TABLE;     // global table
     new_elt->vname[0] = 0;
+    new_elt->L = L;
 
     return new_elt;
 }
@@ -177,28 +194,29 @@ nbrch:
 luaconf_elt *
 luaconf_getEltElt(luaconf_elt *elt, const char *path, size_t path_len)
 {
-    int         n;
+    lua_State   *L;
     const char  *begin, *end, *ptr;
+    luaconf_elt *new_elt;
 
-    n = lua_gettop(L);
+    L = elt->L;
 
-    lua_pushvalue(elt->L, elt->pos);
+    lua_pushvalue(L, elt->pos);
 
     if (path && path_len > 0) {
         begin = path;
         ptr = path;
         end = ptr + path_len;
 
-        while (begin < end && !isalpha(*begin))
+        while (begin < end && !(isalnum(*begin) || *begin == '_'))
             begin++;
 
-        while (begin < end && !isalpha(*(end-1)))
+        while (begin < end && !(isalnum(*(end-1)) || *(end-1) == '_'))
             end--;
 
         if (begin >= end)
             goto nbrch;
 
-        return luaconf_get(L, start, end);
+        return luaconf_get(L, begin, end);
     }
 
 nbrch:
@@ -209,8 +227,8 @@ nbrch:
         return NULL;
     }
 
-    new_elt->pos = n - 1;
-    new_elt->type = LUACONF_TYPE_TABLE;     // global table
+    new_elt->pos = lua_gettop(L);
+    new_elt->type = LUACONF_TYPE_TABLE;     // table
     new_elt->vname[0] = 0;
 
     return new_elt;
@@ -222,6 +240,8 @@ luaconf_get(lua_State *L, const char *begin, const char *end)
     int             n;
     const char      *ptr, *start;
     luaconf_elt     *new_elt;
+
+    /* there was already a table on the stack */
 
     n = lua_gettop(L);
     new_elt = NULL;
@@ -236,9 +256,11 @@ luaconf_get(lua_State *L, const char *begin, const char *end)
             if (ptr > start) {
                 lua_pushlstring(L, start, ptr-start);
                 lua_gettable(L, -2);
-                if (!lua_istable(L, -1)) {        // not table, has no member at all
+                if (!lua_istable(L, -1)) {          // not table, has no member at all
                     goto failed;
                 }
+
+                lua_remove(L, -2);                  // remomve previous table
             }
 
             ptr++;
@@ -256,23 +278,80 @@ luaconf_get(lua_State *L, const char *begin, const char *end)
         if (!new_elt)
             goto failed;
 
-        lua_remove(L, -2);                  // remomve global table
+        lua_remove(L, -2);                          // remomve previous table
+
         new_elt->type = lua_type(L, -1);
         new_elt->pos = lua_gettop(L);
+        new_elt->L = L;
+
+        snprintf(new_elt->vname, sizeof(new_elt->vname), "%.*s", ptr-start, start);
+
+        return new_elt;
     }
-
-    new_elt->vname[0] = 0;
-    new_elt->L = L;
-
-    return new_elt;
 
 failed:
 
     if (new_elt)
         free(new_elt);
 
-    lua_settop(n);
+    lua_settop(L, n-1);     // pop the base table out
 
     return NULL;
+}
+
+size_t
+luaconf_getSubEltCnt(luaconf_elt *elt)
+{
+    LUACONF_ASSERT(elt && elt->type == LUACONF_TYPE_TABLE);
+    return lua_objlen(elt->L, elt->pos);
+}
+
+luaconf_elt **
+luaconf_getSubElts(luaconf_elt *elt, luaconf_elt **vec, size_t size, size_t *n)
+{
+    int             top, i, tb;
+    const char      *key;
+    size_t          key_len;
+    lua_State       *L;
+    luaconf_elt     *new_elt;
+
+    LUACONF_ASSERT(elt && elt->type == LUACONF_TYPE_TABLE);
+
+    L = elt->L;
+    top = lua_gettop(L);
+
+    tb = elt->pos;
+    i = 0;
+
+    lua_pushnil(L);
+
+    while (lua_next(L, tb)) {
+
+        if (i >= size) {
+            lua_pop(L, 2);      // pop the value and key.
+            break;
+        }
+
+        lua_insert(L, -2);      // exchange key and value
+
+        key = lua_tolstring(L, -1, &key_len);
+
+        new_elt = (luaconf_elt*)malloc(sizeof(luaconf_elt));
+        if (new_elt == NULL) {
+            lua_pop(L, 2);
+            break;
+        }
+
+        new_elt->L = L;
+        new_elt->pos = lua_gettop(L) - 1;
+        new_elt->type = lua_type(L, new_elt->pos);
+
+        snprintf(new_elt->vname, LUACONF_MAX_NAME_LEN, "%.*s", key_len, key);
+        vec[i++] = new_elt;
+    }
+
+    *n = i;
+
+    return vec;
 }
 

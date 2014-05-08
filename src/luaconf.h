@@ -12,6 +12,11 @@
 #define LUACONF_ASSERT          assert
 #define LUACONF_MAX_NAME_LEN    256
 
+#define luaconf_isNumber(elt)   (elt->type == LUACONF_TYPE_NUMBER)
+#define luaconf_isString(elt)   (elt->type == LUACONF_TYPE_STRING)
+#define luaconf_isBool(elt)     (elt->type == LUACONF_TYPE_BOOL)
+#define luaconf_isTable(elt)    (elt->type == LUACONF_TYPE_TABLE)
+
 typedef struct luaconf_inst_s  luaconf_inst;
 typedef struct luaconf_elt_s   luaconf_elt;
 typedef double luaconf_Number;
@@ -49,6 +54,8 @@ luaconf_elt * luaconf_getEltElt(luaconf_elt *elt, const char *path, size_t path_
 void luaconf_freeElt(luaconf_elt *elt);
 
 luaconf_Number luaconf_getNumber(luaconf_elt *elt);
+int luaconf_getBool(luaconf_elt *elt);
+
 char * luaconf_getStr(luaconf_elt *elt, char *buf, size_t size, size_t *len);
 size_t luaconf_getStrLen(luaconf_elt *elt);
 
