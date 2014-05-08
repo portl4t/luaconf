@@ -38,6 +38,7 @@ struct luaconf_inst_s {
 struct luaconf_elt_s {
     lua_State       *L;
     char            vname[LUACONF_MAX_NAME_LEN];
+    int             vsize;
     int             pos;
     luaconf_type    type;
 };
@@ -54,6 +55,7 @@ luaconf_elt * luaconf_getEltElt(luaconf_elt *elt, const char *path, size_t path_
 
 void luaconf_freeElt(luaconf_elt *elt);
 
+const char * luaconf_getEltName(luaconf_elt *elt, size_t *size);
 luaconf_Number luaconf_getNumber(luaconf_elt *elt);
 int luaconf_getBool(luaconf_elt *elt);
 

@@ -90,6 +90,15 @@ luaconf_freeElt(luaconf_elt *elt)
     free(elt);
 }
 
+const char *
+luaconf_getEltName(luaconf_elt *elt, size_t *size)
+{
+    LUACONF_ASSERT(elt);
+
+    *size = elt->vsize;
+    return elt->vname;
+}
+
 luaconf_Number
 luaconf_getNumber(luaconf_elt *elt)
 {
@@ -181,6 +190,7 @@ nbrch:
     new_elt->pos = lua_gettop(L);
     new_elt->type = LUACONF_TYPE_TABLE;     // global table
     new_elt->vname[0] = 0;
+    new_elt->vsize = 0;
     new_elt->L = L;
 
     return new_elt;
@@ -225,6 +235,7 @@ nbrch:
     new_elt->pos = lua_gettop(L);
     new_elt->type = LUACONF_TYPE_TABLE;     // table
     new_elt->vname[0] = 0;
+    new_elt->vsize = 0;
 
     return new_elt;
 }
@@ -279,7 +290,7 @@ luaconf_get(lua_State *L, const char *begin, const char *end)
         new_elt->pos = lua_gettop(L);
         new_elt->L = L;
 
-        snprintf(new_elt->vname, sizeof(new_elt->vname), "%.*s", (int)(ptr-start), start);
+        new_elt->vsize = snprintf(new_elt->vname, sizeof(new_elt->vname), "%.*s", (int)(ptr-start), start);
 
         return new_elt;
     }
@@ -341,7 +352,7 @@ luaconf_getSubElts(luaconf_elt *elt, luaconf_elt **vec, size_t size, size_t *n)
         new_elt->pos = lua_gettop(L) - 1;
         new_elt->type = lua_type(L, new_elt->pos);
 
-        snprintf(new_elt->vname, LUACONF_MAX_NAME_LEN, "%.*s", (int)key_len, key);
+        new_elt->vsize = snprintf(new_elt->vname, sizeof(new_elt->vname), "%.*s", (int)key_len, key);
         vec[i++] = new_elt;
     }
 
