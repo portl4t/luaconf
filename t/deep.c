@@ -29,10 +29,8 @@ int main(int argc, char *argv[])
     inst = luaconf_init("conf.lua");
 
     elt1 = luaconf_getElt(inst, "site1", sizeof("site1"));
-    n = lua_gettop(elt1->L);
 
     elt2 = luaconf_getEltElt(elt1, "sub.prefix", sizeof("sub.prefix")-1);
-    n = lua_gettop(elt1->L);
 
     luaconf_getStr(elt2, buf, sizeof(buf), &size);
 
