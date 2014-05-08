@@ -69,3 +69,8 @@ This function opens the `conf` file which is written in Lua and parse it. Upon s
 luaconf_inst *inst = luaconf_init("/X/conf.lua");
 ```
 
+### luaconf_destroy
+**syntax:** void luaconf_destroy(luaconf_inst *inst);
+
+This function will destroy the resources which is owned by `inst` pointer. After we parse the config file, we should use this function to release the resource.
+
