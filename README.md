@@ -61,6 +61,6 @@ int main(int argc, char *argv[])
 ## C API
 
 ### luaconf_init
-**syntax:** *luaconf_inst *luaconf_init(const char *conf);*
+**syntax:** luaconf_inst *luaconf_init(const char *conf);
 
-*description:* *This function opens the `conf` file*
+**description:** This function opens the `conf` file
