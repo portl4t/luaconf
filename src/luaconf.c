@@ -306,14 +306,14 @@ failed:
 }
 
 size_t
-luaconf_getSubEltCnt(luaconf_elt *elt)
+luaconf_getEltSubEltCnt(luaconf_elt *elt)
 {
     LUACONF_ASSERT(elt && elt->type == LUACONF_TYPE_TABLE);
     return lua_objlen(elt->L, elt->pos);
 }
 
 luaconf_elt **
-luaconf_getSubElts(luaconf_elt *elt, luaconf_elt **vec, size_t size, size_t *n)
+luaconf_getEltSubElts(luaconf_elt *elt, luaconf_elt **vec, size_t size, size_t *n)
 {
     int             top, i, tb;
     const char      *key;
@@ -362,7 +362,7 @@ luaconf_getSubElts(luaconf_elt *elt, luaconf_elt **vec, size_t size, size_t *n)
 }
 
 size_t
-luaconf_getEltCnt(luaconf_inst *inst, const char *path, size_t path_len)
+luaconf_getSubEltCnt(luaconf_inst *inst, const char *path, size_t path_len)
 {
     size_t          n;
     luaconf_elt     *elt;
@@ -375,7 +375,7 @@ luaconf_getEltCnt(luaconf_inst *inst, const char *path, size_t path_len)
 
     LUACONF_ASSERT(elt && elt->type == LUACONF_TYPE_TABLE);
 
-    n = luaconf_getSubEltCnt(elt);
+    n = luaconf_getEltSubEltCnt(elt);
 
     luaconf_freeElt(elt);
 
@@ -383,7 +383,7 @@ luaconf_getEltCnt(luaconf_inst *inst, const char *path, size_t path_len)
 }
 
 luaconf_elt **
-luaconf_getElts(luaconf_inst *inst, const char *path, size_t path_len, 
+luaconf_getSubElts(luaconf_inst *inst, const char *path, size_t path_len, 
                     luaconf_elt **vec, size_t size, size_t *n)
 {
     luaconf_elt     *elt;
@@ -398,7 +398,7 @@ luaconf_getElts(luaconf_inst *inst, const char *path, size_t path_len,
 
     LUACONF_ASSERT(elt && elt->type == LUACONF_TYPE_TABLE);
 
-    addr = luaconf_getSubElts(elt, vec, size, n);
+    addr = luaconf_getEltSubElts(elt, vec, size, n);
 
     luaconf_freeElt(elt);
 
