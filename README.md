@@ -143,3 +143,7 @@ Converts the value represent by `elt` to the C string. If len is not NULL, it al
 
 Return the length of the string which is represented by `elt`.
 
+### luaconf_getEltName()
+### luaconf_getSubEltCnt()
+### luaconf_getSubElts()
+
