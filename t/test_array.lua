@@ -1,7 +1,7 @@
 
 /*
 
--- vec.lua
+-- array.lua
 
 site = {
     ['domain_list'] = {
@@ -29,7 +29,7 @@ int main(int argc, char *argv[])
     char            buf[1024];
     luaconf_elt     *vec[256];
 
-    inst = luaconf_init("vec.lua");
+    inst = luaconf_init("array.lua");
     base = luaconf_getElt(inst, "site.domain_list", sizeof("site.domain_list") - 1);
 
     luaconf_getEltSubElts(base, vec, 256, &cnt);
