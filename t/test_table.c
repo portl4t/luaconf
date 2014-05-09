@@ -54,3 +54,10 @@ int main(int argc, char *argv[])
     return 0;
 }
 
+/*
+
+key = domain, val = www.foo.com
+key = level, val = 49
+
+*/
+
