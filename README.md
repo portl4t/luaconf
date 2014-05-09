@@ -89,6 +89,7 @@ This function will retrieve the element which is represent by `path`. Upon succe
 */
 luaconf_elt *elt = luaconf_getElt(inst, "site.domain", sizeof("site.domain")-1);
 ```
+`luaconf_elt` has four possible types: number, string, bool, table.
 
-Parameter `path` can be NULL here.
+Parameter `path` can be NULL here and the element will be a Table.
 
