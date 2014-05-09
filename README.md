@@ -93,3 +93,18 @@ luaconf_elt *elt = luaconf_getElt(inst, "site.domain", sizeof("site.domain")-1);
 
 Parameter `path` can be NULL here and the element will be a Table.
 
+
+### luaconf_freeElt
+**syntax:** void luaconf_freeElt(luaconf_elt *elt);
+
+This function will destroy the resources owed by `elt` pointer. After we get the real data from `elt`, we should use this function to release the resouce.
+
+
+### luaconf_isXXX
+- int luaconf_isNumber(luaconf_elt *elt)
+- int luaconf_isString(luaconf_elt *elt)
+- int luaconf_isBool(luaconf_elt *elt)
+- int luaconf_isTable(luaconf_elt *elt)
+
+These functions can be used to test whether `elt` has XXX type.
+
