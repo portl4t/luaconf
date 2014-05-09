@@ -2,7 +2,7 @@
 
 COMPILE = $(CC) -Wall -D_GNU_SOURCE -D_FILE_OFFSET_BITS=64 -g
 INC_PATH = -I/usr/local/include
-LIB_PATH = -L/usr/local/lib -llua-5.1
+LIB_PATH = -L/usr/local/lib -lm -ldl -llua-5.1
 
 SHARED_OBJS = luaconf.lo
 
