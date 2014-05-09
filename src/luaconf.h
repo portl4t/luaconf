@@ -50,15 +50,19 @@ void luaconf_destroy(luaconf_inst *inst);
 size_t luaconf_getSubEltCnt(luaconf_elt *elt);
 luaconf_elt ** luaconf_getSubElts(luaconf_elt *elt, luaconf_elt **vec, size_t size, size_t *n);
 
+size_t luaconf_getEltCnt(luaconf_inst *inst, const char *path, size_t path_len);
+luaconf_elt ** luaconf_getElts(luaconf_inst *inst, const char *path, size_t path_len,
+                                       luaconf_elt **vec, size_t size, size_t *n);
+
 luaconf_elt * luaconf_getElt(luaconf_inst *inst, const char *path, size_t path_len);
 luaconf_elt * luaconf_getEltElt(luaconf_elt *elt, const char *path, size_t path_len);
 
 void luaconf_freeElt(luaconf_elt *elt);
 
 const char * luaconf_getEltName(luaconf_elt *elt, size_t *size);
+
 luaconf_Number luaconf_getNumber(luaconf_elt *elt);
 int luaconf_getBool(luaconf_elt *elt);
-
 char * luaconf_getStr(luaconf_elt *elt, char *buf, size_t size, size_t *len);
 size_t luaconf_getStrLen(luaconf_elt *elt);
 

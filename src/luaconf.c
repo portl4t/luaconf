@@ -361,3 +361,47 @@ luaconf_getSubElts(luaconf_elt *elt, luaconf_elt **vec, size_t size, size_t *n)
     return vec;
 }
 
+size_t
+luaconf_getEltCnt(luaconf_inst *inst, const char *path, size_t path_len)
+{
+    size_t          n;
+    luaconf_elt     *elt;
+
+    elt = luaconf_getElt(inst, path, path_len);
+
+    if (!elt) {
+        return 0;
+    }
+
+    LUACONF_ASSERT(elt && elt->type == LUACONF_TYPE_TABLE);
+
+    n = luaconf_getSubEltCnt(elt);
+
+    luaconf_freeElt(elt);
+
+    return n;
+}
+
+luaconf_elt **
+luaconf_getElts(luaconf_inst *inst, const char *path, size_t path_len, 
+                    luaconf_elt **vec, size_t size, size_t *n)
+{
+    luaconf_elt     *elt;
+    luaconf_elt     **addr;
+
+    elt = luaconf_getElt(inst, path, path_len);
+
+    if (!elt) {
+        *n = 0;
+        return vec;
+    }
+
+    LUACONF_ASSERT(elt && elt->type == LUACONF_TYPE_TABLE);
+
+    addr = luaconf_getSubElts(elt, vec, size, n);
+
+    luaconf_freeElt(elt);
+
+    return addr;
+}
+
