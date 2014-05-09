@@ -58,6 +58,11 @@ int main(int argc, char *argv[])
     make
     make install
 
+## Demo
+* [test_table.c](https://github.com/portl4t/luaconf/blob/master/t/test_table.c) - extract all the keys and values from a table.
+* [test_array.c](https://github.com/portl4t/luaconf/blob/master/t/test_array.c) - extract all the items from a array
+* [test_deep.c](https://github.com/portl4t/luaconf/blob/master/t/test_deep.c)
+
 ## C API
 
 ### luaconf_init
