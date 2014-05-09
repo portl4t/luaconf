@@ -133,17 +133,106 @@ Converts the value represent by `elt` to the C double type.
 
 Converts the value represent by `elt` to the C boolean type(0 or 1).
 
-### luaconf_getStr()
+### luaconf_getStr
 **syntax:** char * luaconf_getStr(luaconf_elt *elt, char *buf, size_t size, size_t *len);
 
 Converts the value represent by `elt` to the C string. If len is not NULL, it also sets *len with the string length. 
 
-### luaconf_getStrLen()
+### luaconf_getStrLen
 **syntax:** size_t luaconf_getStrLen(luaconf_elt *elt);
 
-Return the length of the string which is represented by `elt`.
+Returns the length of the string which is represented by `elt`.
 
-### luaconf_getEltName()
-### luaconf_getSubEltCnt()
-### luaconf_getSubElts()
+### luaconf_getSubEltCnt
+**syntax:** size_t luaconf_getSubEltCnt(luaconf_inst *inst, const char *path, size_t path_len);
+
+Returns the count of the sub element under the `path`.
+
+```c
+/*
+   site = {
+        ['domain'] = 'www.taobao.com',
+        ['level'] = 5
+   }
+*/
+int n = luaconf_getSubEltCnt(inst, NULL, 0);                                // 1    site
+int m = luaconf_getSubEltCnt(inst, "site", sizeof("site")-1);               // 2    domain, level
+int p = luaconf_getSubEltCnt(inst, "site.domain", sizeof("site.domain")-1); // 0
+```
+
+### luaconf_getSubElts
+**syntax:** luaconf_elt ** luaconf_getSubElts(luaconf_inst *inst, const char *path, size_t path_len, luaconf_elt **vec, size_t size, size_t *n);
+
+Retrieves all the sub elements under the `path` and fills them in the parameter `vec`. It also sets *n with the count of the sub elments.
+
+```c
+/*
+   site = {
+        ['domain'] = 'www.taobao.com',
+        ['level'] = 5
+   }
+*/
+size_t          n;
+luaconf_elt     **vec[128];
+
+luaconf_getSubElts(inst, NULL, 0, vec, 128, &n);        // 1        site
+```
+
+We should free all the sub elements if we don't use them any more.
+
+### luaconf_getEltSubEltCnt
+**syntax:** size_t luaconf_getEltSubEltCnt(luaconf_elt *elt);
+
+Returns the count of the sub element under `elt`.
+
+```c
+/*
+   site = {
+        ['domain'] = 'www.taobao.com',
+        ['level'] = 5
+   }
+*/
+luaconf_elt *elt = luaconf_getElt(inst, NULL, 0);   // site
+int m = luaconf_getEltSubEltCnt(elt);               // 2
+```
+
+### luaconf_getEltSubElts
+**syntax:** luaconf_elt ** luaconf_getEltSubElts(luaconf_elt *elt, luaconf_elt **vec, size_t size, size_t *n);
+
+Retrieves all the sub elements under `elt` and fills them in the parameter `vec`. It also sets *n with the count of the sub elments.
+
+```c
+/*
+   site = {
+        ['domain'] = 'www.taobao.com',
+        ['level'] = 5
+   }
+*/
+size_t          n;
+luaconf_elt     **vec[128];
+
+luaconf_elt *elt = luaconf_getElt(inst, NULL, 0);   // site
+luaconf_getEltSubElts(elt, vec, 128, &n);           // domain, level
+```
+
+We should free all the sub elements if we don't use them any more.
+
+
+### luaconf_getEltName
+**syntax:** const char * luaconf_getEltName(luaconf_elt *elt, size_t *size);
+
+Return the name string of `elt` and set *size to the length of the string. The string memory will be reclaimed if the elt has been freed.
+
+```c
+/*
+   site = {
+        ['domain'] = 'www.taobao.com',
+        ['level'] = 5
+   }
+*/
+size_t size;
+
+luaconf_elt *elt = luaconf_getElt(inst, NULL, 0);
+const char *name = luaconf_getEltName(elt, &size);  // "site"
+```
 
