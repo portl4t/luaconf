@@ -30,10 +30,10 @@ int main(int argc, char *argv[])
     elt2 = luaconf_getElt(inst, "site1.level", sizeof("site1.level")-1);
 
     luaconf_getStr(elt1, buf, sizeof(buf), &size);
-    printf("site1.domain = %.*s\n", size, buf);
+    printf("site1.domain = %.*s\n", size, buf);          // www.taobao.com
     
     n = luaconf_getNumber(elt2);
-    printf("site1.level = %d\n", n);
+    printf("site1.level = %d\n", n);                     // 6
 
     luaconf_freeElt(elt1);
     luaconf_freeElt(elt2);
