@@ -45,7 +45,7 @@ int main(int argc, char *argv[])
 
 ## System Requirements
 * linux/freebsd 32/64bits
-* lua-5.1
+* lua-5.1 / luajit
 
 ## Build
 **step1**: get luaconf
