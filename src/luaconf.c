@@ -315,48 +315,88 @@ luaconf_getEltSubEltCnt(luaconf_elt *elt)
 luaconf_elt **
 luaconf_getEltSubElts(luaconf_elt *elt, luaconf_elt **vec, size_t size, size_t *n)
 {
-    int             top, i, tb;
-    const char      *key;
-    size_t          key_len;
-    lua_State       *L;
-    luaconf_elt     *new_elt;
+    int                 i, tb, cnt;
+    const char          *key;
+    size_t              key_len;
+    lua_State           *L;
+    luaconf_elt         *new_elt;
 
     LUACONF_ASSERT(elt && elt->type == LUACONF_TYPE_TABLE);
 
     L = elt->L;
-    top = lua_gettop(L);
-
     tb = elt->pos;
+
     i = 0;
+    cnt = lua_objlen(L, tb);
 
-    lua_pushnil(L);
+    lua_rawgeti (L, tb, 1);
 
-    while (lua_next(L, tb)) {
+    if (!lua_isnil(L, -1)) {
 
-        if (i >= size) {
-            lua_pop(L, 2);      // pop the value and key.
-            break;
+        /* array */
+        lua_pop(L, 1);      // pop the 1st out.
+
+        i = 1;
+        cnt = cnt <= size ? cnt : size;
+
+        for (; i <= cnt; i++) {
+            lua_rawgeti (L, tb, i);
+
+            if (lua_isnil(L, -1)) {
+                vec[i-1] = NULL;
+                lua_pop(L, 1);      // pop the nil out.
+
+            } else {
+                new_elt = (luaconf_elt*)malloc(sizeof(luaconf_elt));
+                if (new_elt == NULL) {
+                    lua_pop(L, 1);          // pop the value out
+                    break;
+                }
+
+                new_elt->L = L;
+                new_elt->pos = lua_gettop(L);
+                new_elt->type = lua_type(L, new_elt->pos);
+
+                *(unsigned int*)(new_elt->vname) = i - 1;
+                new_elt->vsize = sizeof(unsigned int);
+                vec[i - 1] = new_elt;
+            }
         }
 
-        lua_insert(L, -2);      // exchange key and value
+        *n = i - 1;
 
-        key = lua_tolstring(L, -1, &key_len);
+    } else {
 
-        new_elt = (luaconf_elt*)malloc(sizeof(luaconf_elt));
-        if (new_elt == NULL) {
-            lua_pop(L, 2);
-            break;
+        /* key - value table */
+
+        while (lua_next(L, tb)) {
+
+            if (i >= size) {
+                lua_pop(L, 2);      // pop the value and key.
+                break;
+            }
+
+            lua_insert(L, -2);      // exchange key and value
+
+            key = lua_tolstring(L, -1, &key_len);
+
+            new_elt = (luaconf_elt*)malloc(sizeof(luaconf_elt));
+            if (new_elt == NULL) {
+                lua_pop(L, 2);
+                break;
+            }
+
+            new_elt->L = L;
+            new_elt->pos = lua_gettop(L) - 1;
+            new_elt->type = lua_type(L, new_elt->pos);
+
+            new_elt->vsize = snprintf(new_elt->vname, sizeof(new_elt->vname), "%.*s", (int)key_len, key);
+            vec[i++] = new_elt;
         }
 
-        new_elt->L = L;
-        new_elt->pos = lua_gettop(L) - 1;
-        new_elt->type = lua_type(L, new_elt->pos);
-
-        new_elt->vsize = snprintf(new_elt->vname, sizeof(new_elt->vname), "%.*s", (int)key_len, key);
-        vec[i++] = new_elt;
+        *n = i;
     }
 
-    *n = i;
 
     return vec;
 }
