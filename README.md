@@ -75,6 +75,20 @@ luaconf_inst *inst = luaconf_init("/X/conf.lua");
 This function will destroy the resources owned by `inst` pointer. After we parse the config file, we should use this function to release the resource.
 
 
-#### luaconf_getElt
-***syntax:*  luaconf_elt * luaconf_getElt(luaconf_inst *inst, const char *path, size_t path_len);
+### luaconf_getElt
+**syntax:**  luaconf_elt * luaconf_getElt(luaconf_inst *inst, const char *path, size_t path_len);
+
+This function will retrieve the element which is represent by `path`. Upon successful a `luaconf_elt` pointer is returned. Otherwise, NULL is returned.
+
+```c
+/*
+   site = {
+        ['domain'] = 'www.taobao.com',
+        ['level'] = 5
+   }
+*/
+luaconf_elt *elt = luaconf_getElt(inst, "site.domain", sizeof("site.domain")-1);
+```
+
+Parameter `path` can be NULL here.
 
