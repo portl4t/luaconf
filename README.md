@@ -72,7 +72,7 @@ luaconf_inst *inst = luaconf_init("/X/conf.lua");
 ### luaconf_destroy
 **syntax:**  void luaconf_destroy(luaconf_inst *inst);
 
-This function will destroy the resources owned by `inst` pointer. After we parse the config file, we should use this function to release the resource.
+This function will destroy the resources owned by `inst` pointer. After we parse the config file, we should use this function to release the resources.
 
 
 ### luaconf_getElt
@@ -136,7 +136,7 @@ Converts the value represent by `elt` to the C boolean type(0 or 1).
 ### luaconf_getStr
 **syntax:** char * luaconf_getStr(luaconf_elt *elt, char *buf, size_t size, size_t *len);
 
-Converts the value represent by `elt` to the C string. If len is not NULL, it also sets *len with the string length. 
+Converts the value represent by `elt` to the C string. It also sets *len with the string length. 
 
 ### luaconf_getStrLen
 **syntax:** size_t luaconf_getStrLen(luaconf_elt *elt);
