@@ -144,7 +144,7 @@ Converts the value represent by `elt` to the C string. If len is not NULL, it al
 Returns the length of the string which is represented by `elt`.
 
 ### luaconf_getSubEltCnt
-**syntax:**size_t luaconf_getSubEltCnt(luaconf_inst *inst, const char *path, size_t path_len);
+**syntax:** size_t luaconf_getSubEltCnt(luaconf_inst *inst, const char *path, size_t path_len);
 
 Returns the count of the sub element under the `path`.
 
@@ -161,7 +161,10 @@ int p = luaconf_getSubEltCnt(inst, "site.domain", sizeof("site.domain")-1); // 0
 ```
 
 ### luaconf_getSubElts
-**syntax:** size_t luaconf_getStrLen(luaconf_elt *elt);
+**syntax:** luaconf_elt ** luaconf_getSubElts(luaconf_inst *inst, const char *path, size_t path_len, luaconf_elt **vec, size_t size, size_t *n);
+
+Retrieves all the sub elements under the `path` and fills them in the parameter `vec`. It also sets *n with the count of the sub elments.
+
 ### luaconf_getEltSubEltCnt
 **syntax:** size_t luaconf_getStrLen(luaconf_elt *elt);
 ### luaconf_getEltSubElts
