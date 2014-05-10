@@ -1,7 +1,7 @@
 
 /*
 
-   -- conf.lua
+   -- deep.lua
 
    site1 = {
        ['domain'] = 'www.taobao.com',
@@ -26,7 +26,7 @@ int main(int argc, char *argv[])
     luaconf_elt     *elt2;
     char            buf[1024];
 
-    inst = luaconf_init("conf.lua");
+    inst = luaconf_init("deep.lua");
 
     elt1 = luaconf_getElt(inst, "site1", sizeof("site1"));
 
