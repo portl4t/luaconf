@@ -4,13 +4,13 @@ COMPILE = $(CC) -Wall -D_GNU_SOURCE -D_FILE_OFFSET_BITS=64 -g
 INC_PATH = -I/usr/local/include
 LIB_PATH = -L/usr/local/lib -lm -ldl -llua-5.1
 
-SHARED_OBJS = luaconf.lo
+SHARED_OBJS = libluaconf.lo
 
 ALL_OBJS = $(SHARED_OBJS)
 
 ALL_PRGS = 
 ALL_LIBS = libluaconf.so
-ALL_HEADERS = luaconf.h
+ALL_HEADERS = libluaconf.h
 
 all: $(ALL_OBJS) $(ALL_PRGS) $(ALL_LIBS)
 
@@ -23,8 +23,8 @@ libluaconf.so:
 .c.lo:
 	$(COMPILE) -c -fPIC -o $@ $<  $(INC_PATH)
 install:
-	/bin/cp -f $(ALL_LIBS) /usr/local/lib
-	/bin/cp -f $(ALL_HEADERS) /usr/local/include
+	/bin/cp -f $(ALL_LIBS) /usr/lib64/
+	/bin/cp -f $(ALL_HEADERS) /usr/include
 clean:
 	rm -f $(ALL_OBJS) $(ALL_PRGS) $(ALL_LIBS)
 

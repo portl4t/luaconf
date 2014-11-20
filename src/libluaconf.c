@@ -1,5 +1,5 @@
 
-#include "luaconf.h"
+#include "libluaconf.h"
 
 
 static luaconf_elt * luaconf_get(lua_State *L, const char *start, const char *end);
